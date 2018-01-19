@@ -1,0 +1,22 @@
+/*
+Riempimento di una stringa con un determinato numero di caratteri (filler)
+
+Esempio:
+
+SELECT  dbo.PadLeft(NULL, 3, '0') AS filled	 -- RITORNA NULL IN QUANTO NESSUNA STRINGA DA RIEMPIRE E' STATA SPECIFICATA
+SELECT  dbo.PadLeft('1', 3, '0') AS filled -- RITORNA '001' POICHE' E' STATO RICHIESTO DI PRODURRE UNA STRINGA FINALE LUNGA 3 CARATTERI (PARTENDO DALLA STRINGA "1") RIEMPIENDOLA DI ZERI SULLA SINISTRA
+SELECT  dbo.PadLeft('1', NULL, NULL) AS filled -- RITORNA '01' POICHE', DI DEFAULT, LA FUNZIONE AGGIUNGE UNO ZERO DAVANTI AD UNA STRINGA SE QUESTA E' PIU' CORTA DI DUE CARATTERI
+*/
+ALTER FUNCTION dbo.PadLeft(@Str varchar(max), @Length int = NULL, @Filler varchar(1) = '0')
+RETURNS VARCHAR(max)
+AS
+BEGIN
+	DECLARE @RETVAL varchar(MAX) = NULL
+	IF ISNULL(@Str,'') != ''
+		BEGIN
+			SET @filler = ISNULL(@filler, '0')
+			SET @Length	= ISNULL(@Length, 2)
+			SET @RETVAL = RIGHT(REPLICATE(@Filler, @Length) + @Str, @Length)
+		END
+	RETURN @RETVAL
+END

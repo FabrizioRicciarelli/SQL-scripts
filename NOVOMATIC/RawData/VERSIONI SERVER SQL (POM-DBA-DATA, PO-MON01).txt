@@ -1,0 +1,11 @@
+POM-DBA-DATA: 
+Microsoft SQL Server 2014 - 12.0.4100.1 (X64) 
+	Apr 20 2015 17:29:27 
+	Copyright (c) Microsoft Corporation
+	Standard Edition (64-bit) on Windows NT 6.3 <X64> (Build 9600: ) (Hypervisor)
+
+POM-MON01,1500:
+Microsoft SQL Server 2014 (SP1-CU5) (KB3130926) - 12.0.4439.1 (X64)   
+	Feb 15 2016 12:12:43   
+	Copyright (c) Microsoft Corporation  
+	Standard Edition (64-bit) on Windows NT 6.3 <X64> (Build 9600: ) (Hypervisor) 
