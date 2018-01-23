@@ -1,0 +1,129 @@
+DECLARE @Set1 TABLE
+(
+    pk		BIGINT PRIMARY KEY,
+    ival	INTEGER NULL,
+    cval	CHAR(1) NULL,
+    mval	MONEY NULL
+);
+ 
+DECLARE @Set2 TABLE
+(
+    pk		BIGINT PRIMARY KEY,
+    ival	INTEGER NULL,
+    cval	CHAR(1) NULL,
+    mval	MONEY NULL
+);
+ 
+INSERT @Set1(pk, ival, cval, mval)
+VALUES 
+		(1, 1000, 'a', $1),
+		(2, NULL, 'b', $2),
+		(3, 3000, 'c', NULL),
+		(4, NULL, 'd', $4),
+		(5, 5000, 'e', $5);
+    
+INSERT @Set2(pk, ival, cval, mval)
+VALUES
+		(1, 1000, 'a', NULL),
+		(2, 2000, 'b', $2),
+		(3, NULL, 'c', $3),
+		(4, NULL, 'd', $4),
+		(5, 5999, 'z', $5);
+
+ 
+-- Incorrect results, doesn't account for NULLs
+SELECT
+		'Incorrect results, doesn''t account for NULLs' AS TestType
+		,*
+FROM	@Set1 AS t
+		JOIN 
+		@Set2 AS s 
+		ON s.pk = t.pk
+WHERE	s.ival <> t.ival
+OR		s.cval <> t.cval
+OR		s.mval <> t.mval;
+
+ 
+-- Correct, but verbose and error-prone    
+SELECT
+		'Correct, but verbose and error-prone' AS TestType
+		,*
+FROM	@Set1 AS t
+		JOIN
+		 @Set2 AS s 
+		 ON s.pk = t.pk
+WHERE	s.ival <> t.ival
+OR		(s.ival IS NULL AND t.ival IS NOT NULL)
+OR		(s.ival IS NOT NULL AND t.ival IS NULL)
+OR		s.cval <> t.cval
+OR		(s.cval IS NULL AND t.cval IS NOT NULL)
+OR		(s.cval IS NOT NULL AND t.cval IS NULL)
+OR		s.mval <> t.mval
+OR		(s.mval IS NULL AND t.mval IS NOT NULL)
+OR		(s.mval IS NOT NULL AND t.mval IS NULL);
+ 
+
+-- COALESCE: Correct results, but problematic
+SELECT
+		'COALESCE: Correct results, but problematic' AS TestType
+		,*
+FROM	@Set1 AS t
+		JOIN
+		 @Set2 AS s 
+		 ON s.pk = t.pk
+WHERE	COALESCE(s.ival, -2147483648) <> COALESCE(t.ival, -2147483648)
+OR		COALESCE(s.cval, '¥') <> COALESCE(t.cval, '¥')
+OR		COALESCE(s.mval, $-922337203685477.5808 ) <> COALESCE(t.mval, $-922337203685477.5808)
+        
+ 
+-- ISNULL: Correct results, but problematic
+SELECT
+		'ISNULL: Correct results, but problematic' AS TestType
+		,*
+FROM	@Set1 AS t
+		JOIN 
+		@Set2 AS s 
+		ON s.pk = t.pk
+WHERE	ISNULL(s.ival, -2147483648) <> ISNULL(t.ival, -2147483648)
+OR		ISNULL(s.cval, '¥') <> ISNULL(t.cval, '¥')
+OR		ISNULL(s.mval, $-922337203685477.5808 ) <> ISNULL(t.mval, $-922337203685477.5808)
+ 
+-- INTERSECT:
+-- Correct results in a compact form
+SELECT
+		'NOT EXISTS with INTERSECT: Correct results in a compact form' AS TestType
+		,*
+FROM	@Set1 AS t
+		JOIN 
+		@Set2 AS s 
+		ON s.pk = t.pk
+WHERE	NOT EXISTS (SELECT s.* INTERSECT SELECT t.*)
+
+-- INTERSECT:
+-- Correct results without redundancy on pk-checks
+SELECT
+		'NOT EXISTS with INTERSECT: Correct results without redundancy on pk-checks' AS TestType
+		,*
+FROM	@Set1 AS t
+		JOIN 
+		@Set2 AS s 
+		ON s.pk = t.pk
+WHERE	NOT EXISTS (SELECT s.ival, s.cval, s.mval INTERSECT SELECT t.ival, t.cval, t.mval)
+
+-- NOT EXISTS:
+-- Same query plan, but different results!
+SELECT 
+		'NOT EXISTS alone: Same query plan, but different results!' AS TestType
+		,*
+FROM	@Set1 AS t
+		JOIN 
+		@Set2 AS s 
+		ON s.pk = t.pk
+WHERE	NOT EXISTS 
+		(
+			SELECT	1
+			WHERE	t.pk = s.pk
+			AND		t.ival = s.ival
+			AND		t.cval = s.cval
+			AND		t.mval = s.mval
+		)
