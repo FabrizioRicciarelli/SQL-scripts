@@ -1,0 +1,5 @@
+EXEC (N'SELECT * FROM [GMatica_AGS_DW].[Dim].[GameNameType]') AT [POM-MON01]
+EXEC (N'SELECT * FROM [GMatica_AGS_DW].[Dim].[GameName]') AT [POM-MON01]
+EXEC (N'SELECT * FROM [GMatica_AGS_DW].[Dim].[Game]') AT [POM-MON01]
+EXEC (N'SELECT * FROM [GMatica_AGS_RawData].[Finance].[GamingRoom]') AT [POM-MON01]
+EXEC (N'SELECT * FROM [GMatica_AGS_DW].[Dim].[Game] T1 INNER JOIN [GMatica_AGS_DW].[Dim].[GameName] T2 ON T1.GameNameSK = T2.GameNameSk INNER JOIN [GMatica_AGS_DW].[Dim].[GameNameType] T3 ON T2.GameNameTypeSK = T3.GameNameTypeSK') AT [POM-MON01]
