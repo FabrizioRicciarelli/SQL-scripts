@@ -1,12 +1,12 @@
 CREATE TYPE [ETL].[RAWSESSION_TYPE] AS TABLE(
-	[SessionID] [int] NULL,--IDENTITY(-2147483648,1) NOT NULL,
+	[SessionID] [int] NULL, --IDENTITY(-2147483648,1) NOT NULL
 	[SessionParentID] [int] NULL,
 	[Level] [int] NULL,
 	[UnivocalLocationCode] [varchar](30) NULL,
-	[MachineID] [smallint] NOT NULL,
+	[MachineID] [smallint] NULL,
 	[GD] [varchar](30) NULL,
 	[AamsMachineCode] [varchar](30) NULL,
-	[StartServerTime] [datetime2](3) NOT NULL,
+	[StartServerTime] [datetime2](3) NULL,
 	[EndServerTime] [datetime2](3) NULL,
 	[TotalRows] [int] NULL,
 	[TotalBillIn] [smallint] NULL,
@@ -22,6 +22,5 @@ CREATE TYPE [ETL].[RAWSESSION_TYPE] AS TABLE(
 	[FlagMinVltCredit] [bit] NULL,
 	[StartTicketCode] [varchar](50) NULL
 )
-GO
 
 

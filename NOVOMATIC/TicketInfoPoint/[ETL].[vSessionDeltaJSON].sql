@@ -31,36 +31,46 @@ SELECT
 		,S.TotalOut
 		,S.FlagMinVltCredit
 		,S.StartTicketCode
-		,Delta =
-		(
-			SELECT
-					L.RecID
-					,L.requestDetailId
-					,L.RowID
-					,L.UnivocalLocationCode
-					,L.ServerTime
-					,L.MachineID
-					,L.GD
-					,L.AamsMachineCode
-					,L.GameID
-					,L.GameName
-					,L.VLTCredit
-					,L.TotalBet
-					,L.TotalWon
-					,L.TotalBillIn
-					,L.TotalCoinIn
-					,L.TotalTicketIn
-					,L.TotalHandPay
-					,L.TotalTicketOut
-					,L.Tax
-					,L.TotalIn
-					,L.TotalOut
-					,L.WrongFlag
-					,L.TicketCode
-					,L.SessionID
-			FROM	ETL.Delta L WITH(NOLOCK)
-			WHERE	L.SessionID = S.SessionID
-			AND		L.requestDetailId = S.requestDetailId
-			FOR JSON PATH 
-		)
+		--,Delta = 
+		,Delta = dbo.FlattenedJSON(
+				(
+					SELECT
+							L.RecID
+							,L.requestDetailId
+							,L.RowID
+							,L.UnivocalLocationCode
+							,L.ServerTime
+							,L.MachineID
+							,L.GD
+							,L.AamsMachineCode
+							,L.GameID
+							,L.GameName
+							,L.VLTCredit
+							,L.TotalBet
+							,L.TotalWon
+							,L.TotalBillIn
+							,L.TotalCoinIn
+							,L.TotalTicketIn
+							,L.TotalHandPay
+							,L.TotalTicketOut
+							,L.Tax
+							,L.TotalIn
+							,L.TotalOut
+							,L.WrongFlag
+							,L.TicketCode
+							,L.SessionID
+					FROM	ETL.Delta L WITH(NOLOCK)
+					WHERE	L.SessionID = S.SessionID
+					AND		L.requestDetailId = S.requestDetailId
+					AND		L.UnivocalLocationCode = S.UnivocalLocationCode
+					AND		L.MachineID = S.MachineID
+					AND		L.AamsMachineCode = S.AamsMachineCode
+					AND		L.GD = S.GD
+					FOR		XML AUTO, ROOT('root'), TYPE, ELEMENTS
+					--FOR JSON PATH 
+				)
+			)
 FROM	[ETL].[Session] S WITH(NOLOCK)
+GO
+
+

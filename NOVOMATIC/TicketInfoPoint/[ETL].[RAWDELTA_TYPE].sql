@@ -1,8 +1,8 @@
 CREATE TYPE [ETL].[RAWDELTA_TYPE] AS TABLE(
-	RowID int NOT NULL
+	RowID int NULL -- NOT NULL
 	,UnivocalLocationCode varchar(30) NULL
-	,ServerTime datetime2(3) NOT NULL
-	,MachineID tinyint NOT NULL
+	,ServerTime datetime2(3) NULL -- NOT NULL
+	,MachineID tinyint NULL -- NOT NULL
 	,GD varchar(30) NULL
 	,AamsMachineCode varchar(30) NULL
 	,GameID int NULL
@@ -24,5 +24,6 @@ CREATE TYPE [ETL].[RAWDELTA_TYPE] AS TABLE(
 	,FlagMinVltCredit bit NULL
 	,SessionID int NOT NULL
 )
+GO
 
 
