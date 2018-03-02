@@ -1,5 +1,9 @@
 DECLARE	@elabid int = 4	--4,7,12,16,82
 
+SELECT	TicketCode 
+FROM	[GMATICA_AGS_RawData_Elaborate_GdF].[GDF].[Elaboration] WITH(NOLOCK) 
+WHERE	ElaborationID IN(4,7,12,16,82)
+
 SELECT	
 		TicketCode
 		,ElapsedTime/1000 as ElabSeconds
