@@ -6,3 +6,6 @@ CREATE TYPE [ETL].[TTC_TYPE] AS TABLE(
 	[sessionparentid] [int] NULL,
 	[level] [int] NULL
 )
+GO
+
+

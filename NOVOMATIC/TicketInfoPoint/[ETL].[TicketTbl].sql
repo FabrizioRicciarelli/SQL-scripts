@@ -4,6 +4,7 @@ CREATE TYPE [ETL].[TicketTbl] AS TABLE(
 	[ticket] [varchar](50) NULL,
 	[clubId] [varchar](10) NULL,
 	[ticketDirection] [bit] NULL,
+	[ticketDirectionDesc] [varchar](20) NULL,
 	[univocalLocationCode] [varchar](20) NULL,
 	[elabStart] [datetime] NULL,
 	[elabEnd] [datetime] NULL,
@@ -15,5 +16,6 @@ CREATE TYPE [ETL].[TicketTbl] AS TABLE(
 	[fileNameErrorLog] [varchar](70) NULL,
 	[system_date] [datetime2](3) NULL
 )
+GO
 
 

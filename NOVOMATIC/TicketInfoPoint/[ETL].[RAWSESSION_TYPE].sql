@@ -1,5 +1,5 @@
 CREATE TYPE [ETL].[RAWSESSION_TYPE] AS TABLE(
-	[SessionID] [int] NULL, --IDENTITY(-2147483648,1) NOT NULL
+	[SessionID] [bigint] IDENTITY(-2147483648,1) NOT NULL,
 	[SessionParentID] [int] NULL,
 	[Level] [int] NULL,
 	[UnivocalLocationCode] [varchar](30) NULL,
@@ -22,5 +22,6 @@ CREATE TYPE [ETL].[RAWSESSION_TYPE] AS TABLE(
 	[FlagMinVltCredit] [bit] NULL,
 	[StartTicketCode] [varchar](50) NULL
 )
+GO
 
 
