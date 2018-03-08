@@ -84,7 +84,28 @@ BEGIN TRANSACTION;
 						SELECT @startTime = GETUTCDATE();
 
 						BEGIN TRY
-							EXEC @procedureName
+							DECLARE	
+									@INNERSQL Nvarchar(MAX)
+									,@ReturnCode int
+									,@ID int
+									,@ClubID int
+							
+							SELECT	
+									@INNERSQL = INNERSQL 
+									,@ID = dbo.fnLeftPart(@procedureName,',')
+									,@ClubID = dbo.fnRightPart(@procedureName,',')
+							FROM	##PICKUP
+							WHERE	ID = @ID
+							AND		ClubID = @ClubID 	
+							
+							EXEC	sp_executesqL @INNERSQL, N'@ReturnCode int OUTPUT', @ReturnCode=@ReturnCode
+							
+							UPDATE	##PICKUP
+							SET		token = @token, Returnvalue = @ReturnCode 
+							WHERE	ID = @ID
+							AND		ClubID = @ClubID 	
+
+							--EXEC @procedureName
 						END TRY
 
 						-- This catch block tries to deal with failures of the procedure execution
@@ -284,8 +305,7 @@ IF OBJECT_ID('MyLongRunningProcedure') IS NOT NULL DROP PROC MyLongRunningProced
 GO
 CREATE PROC MyLongRunningProcedure
 AS
-	WAITFOR DELAY '00:00:05';
-	PRINT('FINISHED')
+	WAITFOR DELAY '00:00:15';
 GO
 
 /*
@@ -332,16 +352,34 @@ ALTER DATABASE [GMATICA_AGS_RawData_Elaborate_Tip] SET MULTI_USER
 														  
 Where "databasename" is the name of the database where the service will run.
 
+DECLARE 
+		@token uniqueidentifier
+		,@INNERSQL Nvarchar(MAX)
+DECLARE	
+		@ConcessionaryID			tinyint = 7
+		,@ConcessionaryName			varchar(30)
+		,@XCONFIG XML -- ex Config.Table
+
+SET @ConcessionaryName = ETL.GetConcessionaryName(@ConcessionaryID)
+SET	@XCONFIG =	ETL.WriteXCONFIG(@XCONFIG, @ConcessionaryID, 'POM-MON01', 25, 45, 7200, 50, @ConcessionaryName, 1, 1) 
+
+SELECT [ETL].[BuildDynSQL_CalcAllLevel] (7, '14214358217068117', 1, 1000221, @XCONFIG) AS DynSQL
+
+
 TRUNCATE TABLE AsyncExecResults 
-DECLARE @token uniqueidentifier;
+SET	@INNERSQL = [ETL].[BuildDynSQL_CalcAllLevel] (7, '14214358217068117', 1, 1000221, @XCONFIG) 
+INSERT	##PICKUP(ID, INNERSQL, picked, Token, ReturnValue)
+SELECT	1, @INNERSQL, 0, NULL, NULL
+EXEC	AsyncExecInvoke N'1' ,@token OUTPUT
 
-EXEC	AsyncExecInvoke 
-		N'MyFaultyProcedure'
-        ,@token OUTPUT
+SET	@INNERSQL = [ETL].[BuildDynSQL_CalcAllLevel] (7, '2851042900715907', 1, 1000349, @XCONFIG) 
+INSERT	##PICKUP(ID, INNERSQL, picked, Token, ReturnValue)
+SELECT	2, @INNERSQL, 0, NULL, NULL
+EXEC	AsyncExecInvoke N'2' ,@token OUTPUT
 
-SELECT	*
-FROM	AsyncExecResults
-WHERE	token = @token;
+--SELECT	*
+--FROM	AsyncExecResults
+--WHERE	token = @token;
 
 EXEC	AsyncExecInvoke 
 		N'MyLongRunningProcedure'
